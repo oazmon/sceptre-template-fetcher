@@ -11,8 +11,10 @@ from sceptre_template_fetcher.fetchers.artifactory \
 class Test_GithubFetcher(object):
 
     def setup_method(self):
-        self.fetcher = ArtifactoryFetcher('fake-shared-template-dir')
-        pass
+        self.fetcher = ArtifactoryFetcher(
+            'fake-sceptre-dir',
+            'fake-shared-template-dir'
+        )
 
     def test_class_correctly_initialised(self):
         assert self.fetcher.shared_template_dir == \

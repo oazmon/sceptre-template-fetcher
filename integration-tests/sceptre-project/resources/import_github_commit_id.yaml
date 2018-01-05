@@ -1,0 +1,5 @@
+imports:
+  - provider: github
+    from: cloudreach/sceptre
+    commit_id: 2e457c2d8b370134842e6e030ba28d681b252a47
+    to: github

@@ -1,0 +1,8 @@
+imports:
+  - provider: github
+    github: https://github.intuit.com
+    oauth: 
+        key: oazmon
+    from: SBSEG-EPIC/sceptre-template-fetcher
+    branch: master
+    to: github

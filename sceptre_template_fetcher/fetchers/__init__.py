@@ -2,6 +2,7 @@
 import abc
 import io
 import logging
+from os import path
 from pkg_resources import iter_entry_points
 import six
 import tarfile
@@ -15,8 +16,9 @@ class Fetcher():
     fetchers.
 
     """
-    def __init__(self, shared_template_dir):
+    def __init__(self, sceptre_dir, shared_template_dir):
         self.logger = logging.getLogger(__name__)
+        self.sceptre_dir = sceptre_dir
         self.shared_template_dir = shared_template_dir
 
     @abc.abstractmethod
@@ -63,33 +65,47 @@ class RemoteFetcher(Fetcher):
 
     def fetch(self, import_spec):
         source_extension, source_content = self.remote_fetch(import_spec)
-        target_name = import_spec['to']
+        target = import_spec['to']
+        target = path.join(
+            self.shared_template_dir,
+            target
+        )
+        self.logger.info("to=%s", target)
         if source_extension in ["zip"]:
             with ZipFile(io.BytesIO(source_content)) as zf:
-                zf.extractall(target_name)
+                zf.extractall(target)
         elif source_extension in ["tar", "tar.gz", "tgz"]:
             with tarfile.open(
                 mode='r:*',
                 fileobj=io.BytesIO(source_content)
             ) as tf:
-                tf.extractall(target_name)
+                tf.extractall(target)
         else:
-            with open(target_name, 'wb') as fobj:
+            with open(target, 'wb') as fobj:
                 fobj.write(source_content)
 
 
 class FetcherMap(object):
-    def __init__(self, shared_template_dir):
+    def __init__(self, sceptre_dir, shared_template_dir):
         self.logger = logging.getLogger(__name__)
+        self.sceptre_dir = sceptre_dir
         self.shared_template_dir = shared_template_dir
         self._map = {}
         for entry_point in iter_entry_points(
             "sceptre_template_fetcher.fetchers"
         ):
-            self._map[entry_point.name] = entry_point.load()
+            name = entry_point.name.split('=')[0]
+            self._map[name] = entry_point.load()
+            self.logger.info('loaded fetcher: %s', name)
 
     def fetch(self, import_spec):
         fetcher_name = import_spec.get('provider', 'git')
+        if fetcher_name not in self._map:
+            raise KeyError(
+                '{} is not a valid fetcher: {}'.format(
+                    fetcher_name, self._map.keys()
+                )
+            )
         fetcher_class = self._map[fetcher_name]
-        fetcher = fetcher_class(self.shared_template_dir)
+        fetcher = fetcher_class(self.sceptre_dir, self.shared_template_dir)
         fetcher.fetch(import_spec)

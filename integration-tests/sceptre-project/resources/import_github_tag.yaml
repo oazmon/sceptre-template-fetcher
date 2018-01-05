@@ -1,0 +1,5 @@
+imports:
+  - provider: github
+    from: cloudreach/sceptre
+    tag: v1.3.1
+    to: github

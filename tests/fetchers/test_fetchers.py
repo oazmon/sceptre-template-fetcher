@@ -4,6 +4,7 @@ Created on Dec 19, 2017
 @author: oazmon
 '''
 
+import pytest
 from mock import Mock, patch
 
 from sceptre_template_fetcher.fetchers import Fetcher
@@ -26,8 +27,10 @@ class MockFetcher(Fetcher):
 class TestFetcher(object):
 
     def setup_method(self):
-        self.fetcher = MockFetcher('fake-shared-template-dir')
-        pass
+        self.fetcher = MockFetcher(
+            'fake-sceptre-dir',
+            'fake-shared-template-dir'
+        )
 
     def test_class_correctly_initialised(self):
         assert self.fetcher.shared_template_dir == \
@@ -49,8 +52,10 @@ class MockRemoteFetcher(RemoteFetcher):
 class TestRemoteFetcher(object):
 
     def setup_method(self):
-        self.fetcher = MockRemoteFetcher('fake-shared-template-dir')
-        pass
+        self.fetcher = MockRemoteFetcher(
+            'fake-sceptre-dir',
+            'fake-shared-template-dir'
+        )
 
     def test_class_correctly_initialised(self):
         assert self.fetcher.shared_template_dir == \
@@ -64,7 +69,9 @@ class TestRemoteFetcher(object):
         })
         mockZipFile.assert_called_once()
         mockZipFile.return_value.__enter__.return_value\
-            .extractall.assert_called_once_with('fake-to')
+            .extractall.assert_called_once_with(
+                'fake-shared-template-dir/fake-to'
+            )
 
     @patch('sceptre_template_fetcher.fetchers.tarfile.open')
     def test_fetch_tar_processing(self, mock_tarfile_open):
@@ -74,7 +81,9 @@ class TestRemoteFetcher(object):
         })
         mock_tarfile_open.assert_called_once()
         mock_tarfile_open.return_value.__enter__.return_value\
-            .extractall.assert_called_once_with('fake-to')
+            .extractall.assert_called_once_with(
+                'fake-shared-template-dir/fake-to'
+            )
 
     @patch('sceptre_template_fetcher.fetchers.open')
     def test_fetch_other_processing(self, mock_open):
@@ -82,7 +91,10 @@ class TestRemoteFetcher(object):
         self.fetcher.fetch({
             'to': 'fake-to'
         })
-        mock_open.assert_called_once_with('fake-to', 'wb')
+        mock_open.assert_called_once_with(
+            'fake-shared-template-dir/fake-to',
+            'wb'
+        )
         mock_open.return_value.__enter__.return_value\
             .write.assert_called_once_with('fake-content')
 
@@ -96,7 +108,10 @@ class TestFetcherMap(object):
         mock_iter_entry_points.return_value = [
             self.mock_entry_point
         ]
-        self.fetcher_map = FetcherMap('fake-shared-template-dir')
+        self.fetcher_map = FetcherMap(
+            'fake-sceptre-dir',
+            'fake-shared-template-dir'
+        )
 
     def test_class_correctly_initialised_with_one_fetchers(self):
         assert self.fetcher_map.shared_template_dir == \
@@ -105,8 +120,17 @@ class TestFetcherMap(object):
             'git': self.mock_entry_point.load.return_value
         }
 
-    def test_fetch(self):
+    def test_valid_fetch(self):
         self.fetcher_map.fetch({})
         fetcher = self.mock_entry_point.load.return_value
-        fetcher.assert_called_with('fake-shared-template-dir')
+        fetcher.assert_called_with(
+            'fake-sceptre-dir',
+            'fake-shared-template-dir'
+        )
         fetcher.return_value.fetch.assert_called_with({})
+
+    def test_invalid_fetch(self):
+        with pytest.raises(KeyError):
+            self.fetcher_map.fetch({'provider': 'invalid'})
+        fetcher = self.mock_entry_point.load.return_value
+        fetcher.assert_not_called()

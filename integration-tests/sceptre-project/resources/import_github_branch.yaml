@@ -1,0 +1,5 @@
+imports:
+  - provider: github
+    from: cloudreach/sceptre
+    branch: master
+    to: github

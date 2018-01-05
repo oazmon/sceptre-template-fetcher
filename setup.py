@@ -13,9 +13,7 @@ with open("HISTORY.rst") as history_file:
 
 install_requirements = [
     "sceptre>=1.3.2",
-    "repositorytools>=4.2.4",
     "artifactory",
-    "repositorytools",
     "requests",
     "six"
 ]
@@ -55,11 +53,11 @@ setup(
         ],
         "sceptre_template_fetcher.fetchers": [
             'artifactory='
-            'sceptre_template_fetcher.fetchers.artifactory:ArtifactoryFetcher'
+            'sceptre_template_fetcher.fetchers.artifactory:ArtifactoryFetcher',
             'github='
-            'sceptre_template_fetcher.fetchers.github:GithubFetcher'
+            'sceptre_template_fetcher.fetchers.github:GithubFetcher',
             'local='
-            'sceptre_template_fetcher.fetchers.local:LocalFetcher'
+            'sceptre_template_fetcher.fetchers.local:LocalFetcher',
             'sonotype_nexus='
             'sceptre_template_fetcher.fetchers.sonotype_nexus:SonotypeNexusFetcher'
         ]

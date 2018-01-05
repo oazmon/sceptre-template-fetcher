@@ -10,6 +10,7 @@ This module imports templates into a shared templates directory
 from __future__ import print_function
 import logging
 import yaml
+import os
 from os import path
 from six import string_types
 
@@ -40,6 +41,8 @@ class TemplateFetcher(object):
         self, sceptre_dir, shared_template_dir=None
     ):
         self.logger = logging.getLogger(__name__)
+        # Check is valid sceptre project folder
+        self._check_valid_sceptre_dir(sceptre_dir)
 
         self.sceptre_dir = sceptre_dir
         self.shared_template_dir = path.join(
@@ -48,26 +51,26 @@ class TemplateFetcher(object):
                 if shared_template_dir
                 else "shared-templates"
             )
-        # Check is valid sceptre project folder
-        self._check_valid_sceptre_dir(self.shared_template_dir)
+        if not path.isdir(self.shared_template_dir):
+            os.makedirs(self.shared_template_dir, 0750)
 
         self._fetcher_map = FetcherMap(
-            shared_template_dir=shared_template_dir
+            sceptre_dir=self.sceptre_dir,
+            shared_template_dir=self.shared_template_dir
         )
 
     # From sceptre.config_reader.py
-    def _check_valid_sceptre_dir(self, shared_template_path):
+    def _check_valid_sceptre_dir(self, a_path):
         """
-        Raises an InvalidSceptreDirectoryError if ``path`` is not a directory.
+        Raises an InvalidSceptreDirectoryError if ``a_path`` is
+        not a directory.
 
         :param shared_template_path: A shared template directory path.
         :type shared_template_path: str
         :raises: sceptre.exceptions.InvalidSceptreDirectoryError
         """
-        if not path.isdir(shared_template_path):
-            raise EnvironmentPathNotFoundError(
-                "Check '{0}' exists.".format(shared_template_path)
-            )
+        if not path.isdir(a_path):
+            raise EnvironmentPathNotFoundError(a_path)
 
     def fetch(self, import_file):
         """
@@ -87,11 +90,12 @@ class TemplateFetcher(object):
             )
         with open(import_file, 'r') as fobj:
             content = fobj.read()
-        import_specs = yaml.safe_load(content)
-        if isinstance(import_specs, string_types):
-            raise TypeError(
-                "{} should be a list of import directives"
-                .format(import_file)
-            )
-        for import_spec in import_specs:
-            self._fetcher_map.fetch(import_spec)
+        spec = yaml.safe_load(content)
+        if 'imports' in spec:
+            if isinstance(spec['imports'], string_types):
+                raise TypeError(
+                    "{} should be a list of import directives"
+                    .format(import_file)
+                )
+            for import_spec in spec['imports']:
+                self._fetcher_map.fetch(import_spec)

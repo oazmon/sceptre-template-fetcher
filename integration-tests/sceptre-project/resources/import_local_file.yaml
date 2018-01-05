@@ -1,0 +1,4 @@
+imports:
+  - provider: local
+    from: resources/dummy_template.yaml
+    to: local/dummy_template.yaml

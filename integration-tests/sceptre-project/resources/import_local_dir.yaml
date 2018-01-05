@@ -1,0 +1,4 @@
+imports:
+  - provider: local
+    from: resources/dummy_template_dir
+    to: local/dummy_template_dir
