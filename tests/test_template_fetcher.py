@@ -22,7 +22,8 @@ class TestTemplateFetcher___init__(object):
             sceptre_dir='fake-sceptre-dir'
         )
         mock_fetcher_map.assert_called_once_with(
-            shared_template_dir=None
+            sceptre_dir='fake-sceptre-dir',
+            shared_template_dir='fake-sceptre-dir/shared-templates'
         )
         assert self.template_fetcher.sceptre_dir == "fake-sceptre-dir"
         assert self.template_fetcher.shared_template_dir == \
@@ -39,7 +40,8 @@ class TestTemplateFetcher___init__(object):
             shared_template_dir='fake-shared-dir'
         )
         mock_fetcher_map.assert_called_once_with(
-            shared_template_dir='fake-shared-dir'
+            sceptre_dir='fake-sceptre-dir',
+            shared_template_dir='fake-sceptre-dir/fake-shared-dir'
         )
         assert self.template_fetcher.sceptre_dir == "fake-sceptre-dir"
         assert self.template_fetcher.shared_template_dir == \
@@ -54,9 +56,31 @@ class TestTemplateFetcher___init__(object):
         with pytest.raises(EnvironmentPathNotFoundError):
             self.template_fetcher = TemplateFetcher(
                 sceptre_dir='fake-sceptre-dir',
-                shared_template_dir='fake-shared-dir'
+                shared_template_dir='fake-sceptre-dir/shared-templates'
             )
         mock_fetcher_map.assert_not_called()
+
+    @patch("sceptre_template_fetcher.template_fetcher.FetcherMap")
+    @patch("sceptre_template_fetcher.template_fetcher.os.makedirs")
+    @patch("sceptre_template_fetcher.template_fetcher.path.isdir")
+    def test__missing_shared_template_dir(
+        self, mock_isdir, mock_makedirs, mock_fetcher_map
+    ):
+        def mock_isdir_side_effect(path):
+            return True if path == 'fake-sceptre-dir' else False
+        mock_isdir.side_effect = mock_isdir_side_effect
+        self.template_fetcher = TemplateFetcher(
+            sceptre_dir='fake-sceptre-dir',
+            shared_template_dir='fake-shared-dir'
+        )
+        mock_makedirs.assert_called_once_with(
+            'fake-sceptre-dir/fake-shared-dir',
+            0750
+        )
+        mock_fetcher_map.assert_called_once_with(
+            sceptre_dir='fake-sceptre-dir',
+            shared_template_dir='fake-sceptre-dir/fake-shared-dir'
+        )
 
 
 class TestTemplateFetcher_fetch(object):
@@ -73,7 +97,7 @@ class TestTemplateFetcher_fetch(object):
     @patch("sceptre_template_fetcher.template_fetcher.open")
     def test_default_argument(self, mock_open):
         mock_open.return_value.__enter__.return_value.\
-            read.return_value = yaml.dump([])
+            read.return_value = yaml.dump({})
         self.template_fetcher.fetch(None)
         mock_open.assert_called_once_with('fake-sceptre-dir/import.yaml', 'r')
         self.mock_fetcher_map.fetch.assert_not_called()
@@ -85,7 +109,29 @@ class TestTemplateFetcher_fetch(object):
     @patch("sceptre_template_fetcher.template_fetcher.open")
     def test_bad_yaml_file(self, mock_open):
         mock_open.return_value.__enter__.return_value.\
-            read.return_value = "bad yaml"
+            read.return_value = "%bad yaml':"
+        with pytest.raises(yaml.parser.ParserError):
+            self.template_fetcher.fetch('fake-import.yaml')
+        mock_open.assert_called_once_with(
+            'fake-sceptre-dir/fake-import.yaml',
+            'r'
+        )
+
+    @patch("sceptre_template_fetcher.template_fetcher.open")
+    def test_missing_import_list(self, mock_open):
+        mock_open.return_value.__enter__.return_value.\
+            read.return_value = yaml.dump({})
+        self.template_fetcher.fetch('fake-import.yaml')
+        self.mock_fetcher_map.fetch.assert_not_called()
+        mock_open.assert_called_once_with(
+            'fake-sceptre-dir/fake-import.yaml',
+            'r'
+        )
+
+    @patch("sceptre_template_fetcher.template_fetcher.open")
+    def test_bad_import_stanza(self, mock_open):
+        mock_open.return_value.__enter__.return_value.\
+            read.return_value = "'imports': 'bad-stanza'"
         with pytest.raises(TypeError):
             self.template_fetcher.fetch('fake-import.yaml')
         mock_open.assert_called_once_with(
@@ -96,7 +142,7 @@ class TestTemplateFetcher_fetch(object):
     @patch("sceptre_template_fetcher.template_fetcher.open")
     def test_empty_import_list(self, mock_open):
         mock_open.return_value.__enter__.return_value.\
-            read.return_value = yaml.dump([])
+            read.return_value = yaml.dump({'imports': []})
         self.template_fetcher.fetch('fake-import.yaml')
         self.mock_fetcher_map.fetch.assert_not_called()
         mock_open.assert_called_once_with(
@@ -111,7 +157,7 @@ class TestTemplateFetcher_fetch(object):
             'url': "https://git/repo/path/to/dir/template.yaml"
         }
         mock_open.return_value.__enter__.return_value.\
-            read.return_value = yaml.dump([directive])
+            read.return_value = yaml.dump({'imports': [directive]})
         self.template_fetcher.fetch('fake-import.yaml')
         mock_open.assert_called_once_with(
             'fake-sceptre-dir/fake-import.yaml',
