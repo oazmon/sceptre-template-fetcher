@@ -84,9 +84,12 @@ class TemplateFetcher(object):
             self.shared_template_dir
         )
         if not import_file or not path.isabs(import_file):
+            if not import_file:
+                import_file = "import.yaml"
             import_file = path.join(
                 self.sceptre_dir,
-                import_file if import_file else "import.yaml"
+                'config',
+                import_file
             )
         with open(import_file, 'r') as fobj:
             content = fobj.read()
