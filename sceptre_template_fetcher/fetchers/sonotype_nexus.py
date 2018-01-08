@@ -9,32 +9,51 @@ import requests
 from xml.etree import ElementTree
 
 
+DEFAULT_NEXUS_REPO = 'https://repo.maven.apache.org/maven2'
+
+
 class SonotypeNexusFetcher(RemoteFetcher):
     '''
-    classdocs
+    Fetcher for Nexus Artifacts
+
+    :param sceptre_dir: The absolute path to the Sceptre directory.
+    :type argument: str
+    :param shared_template_dir: The absolute path to the Sceptre
+            shared template directory.
+    :type argument: str
     '''
 
     def __init__(self, *args, **kwargs):
-        '''
-        Constructor
-        '''
         super(SonotypeNexusFetcher, self).__init__(*args, **kwargs)
 
     def remote_fetch(self, import_spec):
-        remote_artifact = self._parse_gav(import_spec['coordinates'])
+        '''
+        Fetcher a Nexus Artifact
+
+        :param import_spec: The yaml import stanza for this operation.
+            The 'repo_url' must specify a base URL to a Nexus repository.
+            The 'from' must specify a Nexus g-a-v or g-a-p-c-v.
+        :type argument: dict
+
+        :return: The type and content of the specified artifact
+        :rtype: tuple
+
+        '''
+        remote_artifact = self._parse_gav(import_spec['from'])
         items = remote_artifact.items()
         # so compares of query_params always work
         items.sort()
         query_params = '&'.join(
             [item[0] + '=' + item[1] for item in items]
         )
+        repo_url = import_spec.get('repo_url', DEFAULT_NEXUS_REPO)
         repo_id = self._query_repo_id(
-            import_spec['repo_url'],
+            repo_url,
             remote_artifact,
             query_params
         )
         content = self._get_artifact(
-            import_spec['repo_url'],
+            repo_url,
             repo_id,
             query_params
         )

@@ -106,7 +106,7 @@ class Test_SonotypeNexusFetcher(object):
         mock_get_artifact.return_value = 'fake-content'
         result = self.fetcher.remote_fetch({
             'repo_url': 'fake-repo-url',
-            'coordinates': 'fake-group:fake-artifact:fake-version'
+            'from': 'fake-group:fake-artifact:fake-version'
         })
         assert result == ('zip', 'fake-content')
         mock_query_repo_id.assert_called_once_with(

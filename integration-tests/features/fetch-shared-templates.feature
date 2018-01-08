@@ -16,22 +16,22 @@ Feature: Fetch Templates
   Scenario: fetch a template repo from public Github by branch
     Given "shared-templates" directory does not exist
     When the user runs fetch templates with "resources/import_github_branch.yaml" file
-    Then "shared-templates/github/sceptre-master/Makefile" file exists
+    Then "shared-templates/github/Makefile" file exists
 
   Scenario: fetch a template repo from public Github by tag
     Given "shared-templates" directory does not exist
     When the user runs fetch templates with "resources/import_github_tag.yaml" file
-    Then "shared-templates/github/sceptre-1.3.1/Makefile" file exists
+    Then "shared-templates/github/Makefile" file exists
 
   Scenario: fetch a template repo from Github by commit id
     Given "shared-templates" directory does not exist
     When the user runs fetch templates with "resources/import_github_commit_id.yaml" file
-    Then "shared-templates/github/sceptre-2e457c2d8b370134842e6e030ba28d681b252a47/Makefile" file exists
+    Then "shared-templates/github/Makefile" file exists
 
   Scenario: fetch a template repo from Github using Github API
     Given "shared-templates" directory does not exist
     When the user runs fetch templates with "resources/import_github_api.yaml" file
-    Then "shared-templates/github/SBSEG-EPIC-sceptre-template-fetcher-36d7cd1/Makefile" file exists
+    Then "shared-templates/github/Makefile" file exists
 
   #Sonotype Nexus
   Scenario: fetch a template repo from Nexus

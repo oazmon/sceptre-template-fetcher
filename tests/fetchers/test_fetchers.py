@@ -64,24 +64,37 @@ class TestRemoteFetcher(object):
     @patch('sceptre_template_fetcher.fetchers.ZipFile')
     def test_fetch_zip_processing(self, mockZipFile):
         self.fetcher.mock_remote_result = ('zip', 'fake-content')
+        mockMember = Mock()
+        mockMember.filename = 'fake-filename'
+        mockZipFile.return_value.__enter__.return_value.filelist = [
+            mockMember
+        ]
         self.fetcher.fetch({
             'to': 'fake-to'
         })
         mockZipFile.assert_called_once()
         mockZipFile.return_value.__enter__.return_value\
-            .extractall.assert_called_once_with(
+            .extract.assert_called_once_with(
+                mockMember,
                 'fake-shared-template-dir/fake-to'
             )
 
     @patch('sceptre_template_fetcher.fetchers.tarfile.open')
     def test_fetch_tar_processing(self, mock_tarfile_open):
         self.fetcher.mock_remote_result = ('tar', 'fake-content')
+        mockMember = Mock()
+        mockMember.name = 'fake-filename'
+        mock_tarfile_open.return_value.__enter__.return_value.\
+            get_members.return_value = [
+                mockMember
+            ]
         self.fetcher.fetch({
             'to': 'fake-to'
         })
         mock_tarfile_open.assert_called_once()
         mock_tarfile_open.return_value.__enter__.return_value\
-            .extractall.assert_called_once_with(
+            .extractfile.assert_called_once_with(
+                mockMember,
                 'fake-shared-template-dir/fake-to'
             )
 

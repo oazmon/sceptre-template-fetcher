@@ -16,15 +16,41 @@ DEFAULT_GITHUB_URL = 'https://github.com'
 
 class GithubFetcher(RemoteFetcher):
     '''
-    classdocs
+    Fetcher for a Github zipped up repo
+
+    :param sceptre_dir: The absolute path to the Sceptre directory.
+    :type argument: str
+    :param shared_template_dir: The absolute path to the Sceptre
+            shared template directory.
+    :type argument: str
     '''
     def __init__(self, *args, **kwargs):
-        '''
-        Constructor
-        '''
         super(GithubFetcher, self).__init__(*args, **kwargs)
 
     def remote_fetch(self, import_spec):
+        '''
+        Fetch Github zipped up repo
+
+        :param import_spec: The yaml import stanza for this operation,
+            which contains:
+            The optional 'github' key specifies the url to Github, which
+                defaults to 'https://github.com'
+            The 'from' key which specifies an 'organization/repo name'.
+            One of the following keys: 'branch', 'tag', or 'commit_id',
+                which specify a branch, tag, and commit_id, respectively.
+            The optional 'oath' map, which contains:
+                An optional 'file' key which specifies the absolute path
+                    to a yaml file and defaults
+                    to '$HOME/.ssh/sceptre_import.yaml'
+                A 'key' key which specifies the key in the 'file' that
+                    contains the Github Personal Access Token to use
+                    for authentication.
+        :type argument: dict
+
+        :return: The type and content of the specified artifact
+        :rtype: tuple
+
+        '''
         headers = self._get_oauth_header(import_spec.get('oauth'))
         if headers:
             archive_url = self._make_api_archive_url(import_spec)
@@ -37,6 +63,12 @@ class GithubFetcher(RemoteFetcher):
             headers=headers
         )
         return ('zip', response.content)
+
+    def process_filename(self, filename):
+        parts = filename.split("/")
+        if len(parts) == 1:
+            return None
+        return path.join(*parts[1:])
 
     def _make_api_archive_url(self, import_spec):
         return '/'.join([

@@ -73,16 +73,26 @@ class RemoteFetcher(Fetcher):
         self.logger.info("to=%s", target)
         if source_extension in ["zip"]:
             with ZipFile(io.BytesIO(source_content)) as zf:
-                zf.extractall(target)
+                for f in zf.filelist:
+                    f.filename = self.process_filename(f.filename)
+                    if f.filename:
+                        zf.extract(f, target)
         elif source_extension in ["tar", "tar.gz", "tgz"]:
             with tarfile.open(
                 mode='r:*',
                 fileobj=io.BytesIO(source_content)
             ) as tf:
-                tf.extractall(target)
+                for f in tf.get_members():
+                    f.name = self.process_filename(f.name)
+                    if f.name:
+                        tf.extractfile(f, target)
         else:
             with open(target, 'wb') as fobj:
                 fobj.write(source_content)
+
+    # To allow sub-classes to modify filename before unzip/untar
+    def process_filename(self, filename):
+        return filename
 
 
 class FetcherMap(object):

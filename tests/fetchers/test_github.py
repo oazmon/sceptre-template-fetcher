@@ -21,6 +21,11 @@ class Test_GithubFetcher(object):
         assert self.fetcher.shared_template_dir == \
             'fake-shared-template-dir'
 
+    def test_process_filename(self):
+        assert self.fetcher.process_filename('a/b/c') == 'b/c'
+        assert self.fetcher.process_filename('a/b') == 'b'
+        assert self.fetcher.process_filename('a') is None
+
     @patch("sceptre_template_fetcher.fetchers.github.requests.get")
     def test_remote_fetch__by_commit_id(self, mock_get):
         result = self.fetcher.remote_fetch({

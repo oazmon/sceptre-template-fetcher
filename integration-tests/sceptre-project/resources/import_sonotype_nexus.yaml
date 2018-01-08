@@ -1,5 +1,5 @@
 imports:
   - provider: sonotype_nexus
     repo_url: http://sdgctgdevrepo.corp.intuit.net/nexus
-    coordinates: com.intuit.tools:aws-resource-validator:1.5.0
+    from: com.intuit.tools:aws-resource-validator:1.5.0
     to: nexus
