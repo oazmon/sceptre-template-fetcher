@@ -94,7 +94,7 @@ class TemplateFetcher(object):
         with open(import_file, 'r') as fobj:
             content = fobj.read()
         spec = yaml.safe_load(content)
-        if 'imports' in spec:
+        if spec and 'imports' in spec:
             if isinstance(spec['imports'], string_types):
                 raise TypeError(
                     "{} should be a list of import directives"

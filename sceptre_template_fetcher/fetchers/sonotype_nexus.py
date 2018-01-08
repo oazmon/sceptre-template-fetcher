@@ -40,24 +40,20 @@ class SonotypeNexusFetcher(RemoteFetcher):
 
         '''
         remote_artifact = self._parse_gav(import_spec['from'])
-        items = remote_artifact.items()
-        # so compares of query_params always work
-        items.sort()
-        query_params = '&'.join(
-            [item[0] + '=' + item[1] for item in items]
-        )
         repo_url = import_spec.get('repo_url', DEFAULT_NEXUS_REPO)
-        repo_id = self._query_repo_id(
+        artifact_url = self._get_artifact_url(
             repo_url,
-            remote_artifact,
-            query_params
+            remote_artifact
         )
-        content = self._get_artifact(
-            repo_url,
-            repo_id,
-            query_params
+        response = requests.get(
+            artifact_url,
+            allow_redirects=True
         )
-        return (remote_artifact.get('e', 'zip'), content)
+        return (
+            artifact_url,
+            remote_artifact.get('e', 'zip'),
+            response.content
+        )
 
     def _parse_gav(self, gav):
         gav_coord = gav.split(':')
@@ -76,33 +72,37 @@ class SonotypeNexusFetcher(RemoteFetcher):
                 'v': gav_coord[4]
             }
 
-    def _query_repo_id(self, repo_url, remote_artifact, query_params):
-        url = repo_url + "/service/local/lucene/search?count=1&" + query_params
+    def _get_artifact_url(self, repo_url, remote_artifact):
+        items = remote_artifact.items()
+        # so compares of query_params always work
+        items.sort()
+        query_params = '&'.join(
+            [item[0] + '=' + item[1] for item in items]
+        )
+
+        find_repo_id_url = \
+            "{}/service/local/lucene/search?count=1&{}".format(
+                repo_url,
+                query_params
+            )
         response = requests.get(
-            url,
+            find_repo_id_url,
             allow_redirects=True
         )
         tree = ElementTree.fromstring(response.content)
         count_element = tree.find('totalCount')
         if count_element is None or count_element.text == '0':
-            raise ValueError("gav not found using url=" + url)
+            raise ValueError("gav not found using url=" + find_repo_id_url)
         repo_ids = tree.findall('.//repositoryId')
         repo_id = repo_ids[0].text
-
         self.logger.debug(
             "%s was found in repo: '%s'",
             remote_artifact['a'],
             repo_id
         )
-        return repo_id
 
-    def _get_artifact(self, repo_url, repo_id, query_params):
-        response = requests.get(
-            repo_url +
-            "/service/local/artifact/maven/content?r=" +
-            repo_id +
-            '&' +
-            query_params,
-            allow_redirects=True
+        return "{}/service/local/artifact/maven/content?r={}&{}".format(
+            repo_url,
+            repo_id,
+            query_params
         )
-        return response.content

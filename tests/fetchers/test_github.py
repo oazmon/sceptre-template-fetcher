@@ -39,7 +39,11 @@ class Test_GithubFetcher(object):
             allow_redirects=True,
             headers=None
         )
-        assert result == ('zip', mock_get.return_value.content)
+        assert result == (
+            'https://github.com/fake-git-repo/archive/fake_commit_id.zip',
+            'zip',
+            mock_get.return_value.content
+        )
 
     @patch("sceptre_template_fetcher.fetchers.github.requests.get")
     def test_remote_fetch__by_tag(self, mock_get):
@@ -53,7 +57,11 @@ class Test_GithubFetcher(object):
             allow_redirects=True,
             headers=None
         )
-        assert result == ('zip', mock_get.return_value.content)
+        assert result == (
+            'https://github.com/fake-git-repo/archive/fake_tag.zip',
+            'zip',
+            mock_get.return_value.content
+        )
 
     @patch("sceptre_template_fetcher.fetchers.github.requests.get")
     def test_remote_fetch__by_branch(self, mock_get):
@@ -66,7 +74,11 @@ class Test_GithubFetcher(object):
             allow_redirects=True,
             headers=None
         )
-        assert result == ('zip', mock_get.return_value.content)
+        assert result == (
+            'https://github.com/fake-git-repo/archive/fake_branch.zip',
+            'zip',
+            mock_get.return_value.content
+        )
 
     @patch("sceptre_template_fetcher.fetchers.github.requests.get")
     def test_remote_fetch__by_bad(self, mock_get):
@@ -121,4 +133,9 @@ class Test_GithubFetcher(object):
                 'Authorization': 'token fake-token'
             }
         )
-        assert result == ('zip', mock_get.return_value.content)
+        assert result == (
+            'https://github.com/api/v3/repos/'
+            'fake-git-repo/zipball/fake_branch',
+            'zip',
+            mock_get.return_value.content
+        )

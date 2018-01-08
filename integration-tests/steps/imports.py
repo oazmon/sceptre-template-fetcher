@@ -7,14 +7,15 @@ from sceptre_template_fetcher.template_fetcher import TemplateFetcher
 
 @given(u'"{directory}" directory does not exist')
 def step_impl(context, directory):
+    dir_path = os.path.join(
+        context.sceptre_dir,
+        directory
+    )
     shutil.rmtree(
-        os.path.join(
-            context.sceptre_dir,
-            directory
-        ),
+        dir_path,
         True
     )
-    assert not os.path.isdir(directory)
+    assert not os.path.isdir(dir_path)
     
 @when(u'the user runs fetch templates with "{path}" file')
 def step_impl(context, path):

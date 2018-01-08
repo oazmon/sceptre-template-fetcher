@@ -64,13 +64,19 @@ class RemoteFetcher(Fetcher):
         pass  # pragma: no cover
 
     def fetch(self, import_spec):
-        source_extension, source_content = self.remote_fetch(import_spec)
+        source, source_extension, source_content = \
+            self.remote_fetch(import_spec)
         target = import_spec['to']
         target = path.join(
             self.shared_template_dir,
             target
         )
-        self.logger.info("to=%s", target)
+        self.logger.info(
+            "%s - from=%s, to=%s",
+            self.remote_fetch.__name__,
+            source,
+            target
+        )
         if source_extension in ["zip"]:
             with ZipFile(io.BytesIO(source_content)) as zf:
                 for f in zf.filelist:
@@ -106,7 +112,7 @@ class FetcherMap(object):
         ):
             name = entry_point.name.split('=')[0]
             self._map[name] = entry_point.load()
-            self.logger.info('loaded fetcher: %s', name)
+            self.logger.debug('loaded fetcher: %s', name)
 
     def fetch(self, import_spec):
         fetcher_name = import_spec.get('provider', 'git')

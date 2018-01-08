@@ -28,6 +28,9 @@ class Test_SonotypeNexusFetcher(object):
                 'c': 'fake-class',
                 'v': 'fake-version'
             }
+        self.fake_query_param = \
+            '&a=fake-artifact&c=fake-class&g=fake-group'\
+            '&p=fake-package&v=fake-version'
 
     def test_class_correctly_initialised(self):
         assert self.fetcher.shared_template_dir == \
@@ -48,20 +51,22 @@ class Test_SonotypeNexusFetcher(object):
         assert result == self.fake_long_artifact
 
     @patch('sceptre_template_fetcher.fetchers.sonotype_nexus.requests.get')
-    def test__query_repo_id__found(self, mock_get):
+    def test__get_artifact_url__found(self, mock_get):
         mock_get.return_value.content = \
             '<fake>' \
             '<totalCount>1</totalCount>' \
             '<repositoryId>fake-repositoryId</repositoryId>' \
             '</fake>'
-        result = self.fetcher._query_repo_id(
+        result = self.fetcher._get_artifact_url(
             'fake-url',
-            self.fake_long_artifact,
-            'fake-query-params'
+            self.fake_long_artifact
         )
-        assert result == 'fake-repositoryId'
+        assert result == 'fake-url/service/local/artifact/maven/content' + \
+            '?r=fake-repositoryId' + \
+            self.fake_query_param
         mock_get.assert_called_once_with(
-            'fake-url/service/local/lucene/search?count=1&fake-query-params',
+            'fake-url/service/local/lucene/search?count=1' +
+            self.fake_query_param,
             allow_redirects=True
         )
 
@@ -72,50 +77,32 @@ class Test_SonotypeNexusFetcher(object):
             '<totalCount>0</totalCount>' \
             '</fake>'
         with pytest.raises(ValueError):
-            self.fetcher._query_repo_id(
+            self.fetcher._get_artifact_url(
                 'fake-url',
-                self.fake_long_artifact,
-                'fake-query-params'
+                self.fake_long_artifact
             )
         mock_get.assert_called_once_with(
-            'fake-url/service/local/lucene/search?count=1&fake-query-params',
+            'fake-url/service/local/lucene/search?count=1' +
+            self.fake_query_param,
             allow_redirects=True
         )
 
     @patch('sceptre_template_fetcher.fetchers.sonotype_nexus.requests.get')
-    def test__get_artifact(self, mock_get):
-        mock_get.return_value.content = 'fake-content'
-        result = self.fetcher._get_artifact(
-            'fake-url',
-            'fake-repo-id',
-            'fake-query-params'
-        )
-        assert result == 'fake-content'
-        mock_get.assert_called_once_with(
-            'fake-url/service/local/artifact/maven/content?'
-            'r=fake-repo-id&fake-query-params',
-            allow_redirects=True
-        )
-
     @patch('sceptre_template_fetcher.fetchers.sonotype_nexus.'
-           'SonotypeNexusFetcher._get_artifact')
-    @patch('sceptre_template_fetcher.fetchers.sonotype_nexus.'
-           'SonotypeNexusFetcher._query_repo_id')
-    def test_remote_fetch(self, mock_query_repo_id, mock_get_artifact):
-        mock_query_repo_id.return_value = 'fake-repo-id'
-        mock_get_artifact.return_value = 'fake-content'
+           'SonotypeNexusFetcher._get_artifact_url')
+    def test_remote_fetch(self, mock_get_artifact_url, mock_get_artifact):
+        mock_get_artifact_url.return_value = 'fake-repo-url'
+        mock_get_artifact.return_value.content = 'fake-content'
         result = self.fetcher.remote_fetch({
             'repo_url': 'fake-repo-url',
             'from': 'fake-group:fake-artifact:fake-version'
         })
-        assert result == ('zip', 'fake-content')
-        mock_query_repo_id.assert_called_once_with(
+        assert result == ('fake-repo-url', 'zip', 'fake-content')
+        mock_get_artifact_url.assert_called_once_with(
             'fake-repo-url',
-            self.fake_short_artifact,
-            'a=fake-artifact&g=fake-group&v=fake-version'
+            self.fake_short_artifact
         )
         mock_get_artifact.assert_called_once_with(
             'fake-repo-url',
-            'fake-repo-id',
-            'a=fake-artifact&g=fake-group&v=fake-version'
+            allow_redirects=True
         )

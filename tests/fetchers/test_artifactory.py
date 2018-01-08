@@ -31,4 +31,8 @@ class Test_GithubFetcher(object):
         mock_artifactory.ArtifactoryPath.assert_called_once_with(
             'fake-repo-url.fake_ext'
         )
-        assert result == ('fake_ext', 'fake-content')
+        assert result == (
+            mock_artifactory.ArtifactoryPath.return_value,
+            'fake_ext',
+            'fake-content'
+        )

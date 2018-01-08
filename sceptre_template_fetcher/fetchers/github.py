@@ -56,13 +56,13 @@ class GithubFetcher(RemoteFetcher):
             archive_url = self._make_api_archive_url(import_spec)
         else:
             archive_url = self._make_archive_url(import_spec)
-        self.logger.info("Requesting url=%s", archive_url)
+        self.logger.debug("Requesting url=%s", archive_url)
         response = requests.get(
             archive_url,
             allow_redirects=True,
             headers=headers
         )
-        return ('zip', response.content)
+        return (archive_url, 'zip', response.content)
 
     def process_filename(self, filename):
         parts = filename.split("/")

@@ -99,7 +99,10 @@ class TestTemplateFetcher_fetch(object):
         mock_open.return_value.__enter__.return_value.\
             read.return_value = yaml.dump({})
         self.template_fetcher.fetch(None)
-        mock_open.assert_called_once_with('fake-sceptre-dir/config/import.yaml', 'r')
+        mock_open.assert_called_once_with(
+            'fake-sceptre-dir/config/import.yaml',
+            'r'
+        )
         self.mock_fetcher_map.fetch.assert_not_called()
 
     def test_missing_import_file(self):

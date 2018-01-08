@@ -63,7 +63,11 @@ class TestRemoteFetcher(object):
 
     @patch('sceptre_template_fetcher.fetchers.ZipFile')
     def test_fetch_zip_processing(self, mockZipFile):
-        self.fetcher.mock_remote_result = ('zip', 'fake-content')
+        self.fetcher.mock_remote_result = (
+            'fake-content-from',
+            'zip',
+            'fake-content'
+        )
         mockMember = Mock()
         mockMember.filename = 'fake-filename'
         mockZipFile.return_value.__enter__.return_value.filelist = [
@@ -81,7 +85,11 @@ class TestRemoteFetcher(object):
 
     @patch('sceptre_template_fetcher.fetchers.tarfile.open')
     def test_fetch_tar_processing(self, mock_tarfile_open):
-        self.fetcher.mock_remote_result = ('tar', 'fake-content')
+        self.fetcher.mock_remote_result = (
+            'fake-content-from',
+            'tar',
+            'fake-content'
+        )
         mockMember = Mock()
         mockMember.name = 'fake-filename'
         mock_tarfile_open.return_value.__enter__.return_value.\
@@ -100,7 +108,11 @@ class TestRemoteFetcher(object):
 
     @patch('sceptre_template_fetcher.fetchers.open')
     def test_fetch_other_processing(self, mock_open):
-        self.fetcher.mock_remote_result = ('txt', 'fake-content')
+        self.fetcher.mock_remote_result = (
+            'fake-content-from',
+            'txt',
+            'fake-content'
+        )
         self.fetcher.fetch({
             'to': 'fake-to'
         })

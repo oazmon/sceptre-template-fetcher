@@ -39,4 +39,4 @@ class ArtifactoryFetcher(RemoteFetcher):
         extension = path.splitext(import_spec['from'])[1][1:]
         with artifactory_path.open() as fobj:
             content = fobj.read()
-        return (extension, content)
+        return (artifactory_path, extension, content)
