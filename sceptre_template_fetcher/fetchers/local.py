@@ -29,7 +29,7 @@ class LocalFetcher(Fetcher):
 
         :param import_spec: The yaml import stanza for this operation,
             which contains:
-            
+
             The 'from' key which specifies an absolute path to the
                 file or directory to fetch.
 

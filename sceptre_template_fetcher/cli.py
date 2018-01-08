@@ -21,7 +21,8 @@ from template_fetcher import TemplateFetcher
 
 
 @click.group()
-@click.version_option(version=__version__, prog_name="Sceptre Template Fetcher")
+@click.version_option(version=__version__,
+                      prog_name="Sceptre Template Fetcher")
 @click.option("--debug", is_flag=True, help="Turn on debug logging.")
 @click.option(
     "--dir", "directory", help="Specify sceptre_migration_tool directory.")

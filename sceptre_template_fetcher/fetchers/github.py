@@ -33,7 +33,7 @@ class GithubFetcher(RemoteFetcher):
 
         :param import_spec: The yaml import stanza for this operation,
             which contains:
-            
+
             The optional 'github' key specifies the url to Github, which
                 defaults to 'https://github.com'
 
