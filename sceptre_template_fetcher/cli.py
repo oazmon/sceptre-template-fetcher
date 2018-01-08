@@ -35,7 +35,7 @@ def cli(
         ctx, debug, directory, var, var_file
 ):  # pragma: no cover
     """
-    Implements sceptre_migration_tool's CLI.
+    Implements sceptre_template_fetcher's CLI.
     """
     setup_logging(debug)
     colorama.init()

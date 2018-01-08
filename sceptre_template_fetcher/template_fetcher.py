@@ -72,15 +72,14 @@ class TemplateFetcher(object):
         if not path.isdir(a_path):
             raise EnvironmentPathNotFoundError(a_path)
 
-    def fetch(self, import_file):
+    def fetch(self, import_file=None):
         """
         Fetch all the shared templates found in the import configuration.
 
         :raises: sceptre.exceptions.???
         """
         self.logger.info(
-            "%s - Importing templates into '%s'",
-            import_file,
+            "Importing templates into '%s'",
             self.shared_template_dir
         )
         if not import_file or not path.isabs(import_file):
@@ -91,6 +90,10 @@ class TemplateFetcher(object):
                 'config',
                 import_file
             )
+        self.logger.info(
+            "Using import config '%s'",
+            import_file
+        )
         with open(import_file, 'r') as fobj:
             content = fobj.read()
         spec = yaml.safe_load(content)
