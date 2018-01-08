@@ -115,7 +115,7 @@ class FetcherMap(object):
             self.logger.debug('loaded fetcher: %s', name)
 
     def fetch(self, import_spec):
-        fetcher_name = import_spec.get('provider', 'git')
+        fetcher_name = import_spec.get('provider', 'github')
         if fetcher_name not in self._map:
             raise KeyError(
                 '{} is not a valid fetcher: {}'.format(

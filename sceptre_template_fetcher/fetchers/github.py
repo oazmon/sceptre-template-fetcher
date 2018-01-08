@@ -33,18 +33,25 @@ class GithubFetcher(RemoteFetcher):
 
         :param import_spec: The yaml import stanza for this operation,
             which contains:
+            
             The optional 'github' key specifies the url to Github, which
                 defaults to 'https://github.com'
+
             The 'from' key which specifies an 'organization/repo name'.
+
             One of the following keys: 'branch', 'tag', or 'commit_id',
                 which specify a branch, tag, and commit_id, respectively.
+
             The optional 'oath' map, which contains:
+
                 An optional 'file' key which specifies the absolute path
                     to a yaml file and defaults
                     to '$HOME/.ssh/sceptre_import.yaml'
+
                 A 'key' key which specifies the key in the 'file' that
                     contains the Github Personal Access Token to use
                     for authentication.
+
         :type argument: dict
 
         :return: The type and content of the specified artifact

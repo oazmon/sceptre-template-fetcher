@@ -29,10 +29,13 @@ class LocalFetcher(Fetcher):
 
         :param import_spec: The yaml import stanza for this operation,
             which contains:
+            
             The 'from' key which specifies an absolute path to the
                 file or directory to fetch.
+
             The 'to' key which specifies a path relative to the shared
                 template dir where the file or directory is placed.
+
         :type argument: dict
         '''
         source = import_spec['from']

@@ -3,7 +3,7 @@
 """
 sceptre_migration_tool.cli
 
-This module implements the Sceptre Migration Tool CLI
+This module implements the Sceptre Template Fetcher CLI
 """
 
 import os
@@ -21,7 +21,7 @@ from template_fetcher import TemplateFetcher
 
 
 @click.group()
-@click.version_option(version=__version__, prog_name="Sceptre Migration Tool")
+@click.version_option(version=__version__, prog_name="Sceptre Template Fetcher")
 @click.option("--debug", is_flag=True, help="Turn on debug logging.")
 @click.option(
     "--dir", "directory", help="Specify sceptre_migration_tool directory.")

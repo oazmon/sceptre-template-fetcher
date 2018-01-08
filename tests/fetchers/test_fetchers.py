@@ -129,7 +129,7 @@ class TestFetcherMap(object):
     @patch('sceptre_template_fetcher.fetchers.iter_entry_points')
     def setup_method(self, test_method, mock_iter_entry_points):
         self.mock_entry_point = Mock()
-        self.mock_entry_point.name = 'git'
+        self.mock_entry_point.name = 'github'
         mock_iter_entry_points.return_value = [
             self.mock_entry_point
         ]
@@ -142,7 +142,7 @@ class TestFetcherMap(object):
         assert self.fetcher_map.shared_template_dir == \
             'fake-shared-template-dir'
         assert self.fetcher_map._map == {
-            'git': self.mock_entry_point.load.return_value
+            'github': self.mock_entry_point.load.return_value
         }
 
     def test_valid_fetch(self):

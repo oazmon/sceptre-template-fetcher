@@ -30,10 +30,10 @@ class TemplateFetcher(object):
     :param sceptre_dir: The absolute path to the Sceptre directory.
     :type sceptre_dir: str
     :param shared_template_dir: The path relative to sceptre dir
-    to the shared template directory.
+        to the shared template directory.
     :type shared_template_dir: str
-    :param import_file: The path relative to sceptre dir to the yaml file
-     that contains the import instructions.
+    :param import_file: The path relative to sceptre dir to the yaml file.
+        that contains the import instructions.
     :type import_file: str
     """
 

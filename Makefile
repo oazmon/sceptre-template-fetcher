@@ -75,8 +75,8 @@ docs:
 	rm -f docs/modules.rst
 	sphinx-apidoc -o docs/ sceptre_template_fetcher
 	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
+	$(MAKE) -C docs build-latest
+	$(BROWSER) docs/_site/index.html
 
 servedocs: docs
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .

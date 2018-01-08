@@ -1,8 +1,8 @@
-======================================
-Contributing to Sceptre Migration Tool
-======================================
+========================================
+Contributing to Sceptre Template Fetcher
+========================================
 
-Thanks for your interest in Sceptre Migration Tool! We greatly appreciate any contributions to the project.
+Thanks for your interest in Sceptre Template Fetcher! We greatly appreciate any contributions to the project.
 
 - `Code of Conduct`_
 - `How to Contribute`_
@@ -103,7 +103,7 @@ Get Started
       $ make test
       $ make coverage
 
-   Note: Sceptre Migration Tool aims to be compatible with Python 2 & 3, please run unit test against both versions. You will need the corresponding versions of Python installed on your system.
+   Note: Sceptre Template Fetcher aims to be compatible with Python 2 & 3, please run unit test against both versions. You will need the corresponding versions of Python installed on your system.
 
    Run unit tests and coverage using tox for Python 2.7 and 3.6:
 
