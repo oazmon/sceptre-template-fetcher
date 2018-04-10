@@ -43,7 +43,10 @@ class Test_LocalFetcher(object):
             'from': 'here',
             'to': 'there'
         })
-        mock_makedirs.assert_called_once_with('fake-shared-template-dir', 0o750)
+        mock_makedirs.assert_called_once_with(
+            'fake-shared-template-dir',
+            0o750
+        )
         mock_copy.assert_called_once_with(
             'fake-sceptre-dir/here',
             'fake-shared-template-dir/there'
