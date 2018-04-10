@@ -52,7 +52,7 @@ class TemplateFetcher(object):
                 else "shared-templates"
             )
         if not path.isdir(self.shared_template_dir):
-            os.makedirs(self.shared_template_dir, 0750)
+            os.makedirs(self.shared_template_dir, 0o750)
 
         self._fetcher_map = FetcherMap(
             sceptre_dir=self.sceptre_dir,

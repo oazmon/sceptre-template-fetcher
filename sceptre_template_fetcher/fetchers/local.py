@@ -54,5 +54,5 @@ class LocalFetcher(Fetcher):
             shutil.copytree(source, target)
         else:
             target_dir = path.dirname(target)
-            os.makedirs(target_dir, 0750)
+            os.makedirs(target_dir, 0o750)
             shutil.copy(source, target)

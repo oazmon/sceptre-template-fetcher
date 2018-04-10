@@ -75,7 +75,7 @@ class TestTemplateFetcher___init__(object):
         )
         mock_makedirs.assert_called_once_with(
             'fake-sceptre-dir/fake-shared-dir',
-            0750
+            0o750
         )
         mock_fetcher_map.assert_called_once_with(
             sceptre_dir='fake-sceptre-dir',
